@@ -277,6 +277,13 @@ class Embed
             $iframe = '<iframe';
 
             foreach ($this->provider['render']['iframe'] as $attribute => $val) {
+                if ($attribute == 'src'  ) {
+                    if ( isset($this->provider['render']['iframe']['start'])) {
+                       $seconds = $this->convertTimeToSeconds($this->provider['render']['iframe']['start']);
+                       $val .= '&start=' . $seconds;
+                    }
+                   
+                }
                 $iframe .= sprintf(' %s="%s"', $attribute, $val);
             }
 
@@ -289,6 +296,35 @@ class Embed
         }
     }
 
+    /**
+     * Convert youtube time query string foramt to seconds
+     *
+     * @return string
+     */
+    public function convertTimeToSeconds($time)
+    {
+        
+
+        preg_match("/(\d+)(?=s)/", $time, $seconds);
+        preg_match("/(\d+)(?=m)/", $time, $minutes);
+        preg_match("/(\d+)(?=h)/", $time, $hours);
+
+        $hoursInSec = $minutsInSec  = $sec = 0;
+
+        if (!empty($seconds) && $seconds[0] != 0) {
+             $sec = $seconds[0];
+        }
+
+
+        if (!empty($minutes) && $minutes[0] != 0) {
+            $minutsInSec = $minutes[0]  * 60;
+        }
+          if (!empty($hours) && $hours[0] != 0) {
+            $hoursInSec = $hours[0]  * 60 * 60;
+        }      
+          $totalSeconds =  $hoursInSec + $minutsInSec  + $sec;
+        return $totalSeconds;
+    }
     /**
      * Generate object for embed if required and available.
      *
